@@ -1,15 +1,31 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { updateCart } from "../utils/cartUtils";
 
-const initialState = localStorage.getItem("cart")
+const defaultState = {
+    exchangeItems: [],
+    startDate: null,
+    duration: null,
+    daysLate: 0,
+    isBookDamaged: false,
+    shippingAddress: {},
+    paymentMethod: '',
+    membershipPrice: '9.99',
+    lateFee: '0.00',
+    damageFee: '0.00',
+    totalPrice: '9.99',
+};
+
+const savedCart = localStorage.getItem("cart")
     ? JSON.parse(localStorage.getItem("cart"))
-    : { 
-        exchangeItems: [],
-        startDate: null,
-        duration: null,
-        daysLate: 0,
-        isBookDamaged: false,
-    };
+    : null;
+
+const initialState = savedCart
+    ? {
+        ...defaultState,
+        ...savedCart,
+        exchangeItems: savedCart.exchangeItems || savedCart.cartItems || [],
+    }
+    : defaultState;
 
 const cartSlice = createSlice({
     name: "cart",
@@ -44,6 +60,14 @@ const cartSlice = createSlice({
             state.isBookDamaged = action.payload;
             return updateCart(state);
         },
+        saveShippingAddress: (state, action) => {
+            state.shippingAddress = action.payload;
+            return updateCart(state);
+        },
+        savePaymentMethod: (state, action) => {
+            state.paymentMethod = action.payload;
+            return updateCart(state);
+        },
         clearExchangeList: (state) => {
             state.exchangeItems = [];
             return updateCart(state);
@@ -51,6 +75,15 @@ const cartSlice = createSlice({
     },
 });
 
-export const { addToCart, removeFromCart, saveShippingAddress, savePaymentMethod, clearCartItems } = cartSlice.actions;
+export const {
+    addToExchangeList,
+    removeFromExchangeList,
+    saveExchangeDate,
+    reportLateReturn,
+    reportBookDamage,
+    saveShippingAddress,
+    savePaymentMethod,
+    clearExchangeList,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;
