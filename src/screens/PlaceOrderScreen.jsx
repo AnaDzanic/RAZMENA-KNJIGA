@@ -61,6 +61,18 @@ const PlaceOrderScreen = () => {
                         </ListGroup.Item>
 
                         <ListGroup.Item>
+                            <h2>Datum razmene</h2>
+                            <p>
+                                <strong>Pocetak: </strong>
+                                {cart.startDate}
+                            </p>
+                            <p>
+                                <strong>Trajanje: </strong>
+                                {cart.duration} dana
+                            </p>
+                        </ListGroup.Item>
+
+                        <ListGroup.Item>
                             <h2>Način plaćanja</h2>
                             {cart.paymentMethod}
                         </ListGroup.Item>

@@ -1,4 +1,4 @@
-const MONTHLY_FEE = 9.99;
+const MONTHLY_FEE = 500;
 const LATE_FEE = 5.00;
 const DAMAGE_FEE = 20.00;
 
