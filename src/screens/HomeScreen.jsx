@@ -1,8 +1,12 @@
 import { Row, Col } from 'react-bootstrap'
 import Product from '../components/Product'
-import books from '../product_list'
+import { useGetProductsQuery } from '../slices/productsApiSlice'
+import Loader from '../components/Loader'
+import Message from '../components/Message'
 
 const HomeScreen = () => {
+    const { data: books, isLoading, error } = useGetProductsQuery();
+
     return (
         <>
             <div className="hero">
@@ -13,13 +17,21 @@ const HomeScreen = () => {
             </div>
 
             <h2>Nove knjige</h2>
-            <Row className="g-4">
-                {books.map((book) => (
-                    <Col key={book.id} sm={12} md={6} lg={4} xl={3}>
-                        <Product book={book} />
-                    </Col>
-                ))}
-            </Row>
+            {isLoading ? (
+                <Loader />
+            ) : error ? (
+                <Message variant='danger'>
+                    {error?.data?.message || error.error}
+                </Message>
+            ) : (
+                <Row className="g-4">
+                    {books.map((book) => (
+                        <Col key={book._id} sm={12} md={6} lg={4} xl={3}>
+                            <Product book={book} />
+                        </Col>
+                    ))}
+                </Row>
+            )}
         </>
     )
 }

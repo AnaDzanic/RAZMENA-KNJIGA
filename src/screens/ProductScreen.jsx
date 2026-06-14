@@ -2,18 +2,20 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Row, Col, Image, Card, Button, Badge } from 'react-bootstrap'
 import Rating from '../components/Rating'
 import Message from '../components/Message'
-import books from '../product_list'
-import { addToExchangeList } from '../slices/cartSlice'
+import Loader from '../components/Loader'
+import { useGetProductDetailsQuery } from '../slices/productsApiSlice'
+import { addToCart } from '../slices/cartSlice'
 import { useDispatch } from 'react-redux'
 
 const ProductScreen = () => {
     const { id: productId } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const product = books.find((book) => String(book.id) === String(productId));
+
+    const { data: product, isLoading, error } = useGetProductDetailsQuery(productId);
 
     const addToCartHandler = () => {
-        dispatch(addToExchangeList({ ...product, _id: product.id }));
+        dispatch(addToCart({ ...product }));
         navigate('/cart');
     }
 
@@ -22,9 +24,11 @@ const ProductScreen = () => {
             <Link className='btn btn-outline-secondary mb-4' to='/'>
                 Nazad
             </Link>
-            {!product ? (
+            {isLoading ? (
+                <Loader />
+            ) : error ? (
                 <Message variant="danger">
-                    Knjiga nije pronadjena
+                    {error?.data?.message || error.error}
                 </Message>
             ) : (
                 <>
@@ -63,12 +67,12 @@ const ProductScreen = () => {
                                         <span>{product.author}</span>
                                     </div>
                                     <div className='d-flex justify-content-between mb-3'>
-                                        <span>Zanr:</span>
+                                        <span>Žanr:</span>
                                         <span>{product.category}</span>
                                     </div>
                                     <div className='d-flex justify-content-between align-items-center mb-4'>
                                         <span>Status:</span>
-                                        {product.status === 'Dostupna' ? (
+                                        {product.isAvailable ? (
                                             <Badge bg='success'>Dostupna</Badge>
                                         ) : (
                                             <Badge bg='danger'>Nije dostupna</Badge>
@@ -78,7 +82,7 @@ const ProductScreen = () => {
                                         <Button
                                             className='add-to-cart-btn'
                                             type='button'
-                                            disabled={product.status !== 'Dostupna'}
+                                            disabled={!product.isAvailable}
                                             onClick={addToCartHandler}
                                         >
                                             Dodaj u listu za razmenu
