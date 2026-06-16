@@ -124,12 +124,42 @@ const approveOrder = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc Reject order
+// @route PUT /api/orders/:id/reject
+// @access Private/Admin
+const rejectOrder = asyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+        order.isApproved = false;
+        order.rejectedAt = Date.now();
+        const updatedOrder = await order.save();
+        res.status(200).json(updatedOrder);
+    } else {
+        res.status(404);
+        throw new Error('Zahtev za razmenu nije pronađen');
+    }
+});
+
 // @desc Get all orders
 // @route GET /api/orders 
 // @access Private/Admin
 const getOrders = asyncHandler(async (req, res) => {
     const orders = await Order.find({}).populate('user', 'name email');
     res.status(200).json(orders);
+});
+
+// @desc Delete order
+// @route DELETE /api/orders/:id
+// @access Private/Admin
+const deleteOrder = asyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+        await Order.deleteOne({ _id: req.params.id });
+        res.status(200).json({ message: 'Zahtev je obrisan' });
+    } else {
+        res.status(404);
+        throw new Error('Zahtev za razmenu nije pronađen');
+    }
 });
 
 export { 
@@ -139,5 +169,7 @@ export {
     updateOrderToPaid, 
     updateOrderToCompleted,
     approveOrder,
+    rejectOrder,
+    deleteOrder,
     getOrders 
 };
